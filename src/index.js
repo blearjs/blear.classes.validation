@@ -249,7 +249,7 @@ pro[_valiItem] = function (data) {
             var ruleSelect = the[_ruleItems][item[0]];
 
             if (item[0] !== 'remote') {
-                validateResult.result = ruleSelect.method.apply(null, param);
+                validateResult.result = ruleSelect.apply(null, param);
 
                 if (!validateResult.result) {
                     validateResult.rule = item[0];
