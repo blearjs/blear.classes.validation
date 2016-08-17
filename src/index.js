@@ -32,6 +32,7 @@ var Validation = Events.extend({
 
         the[_options] = object.assign({}, defaults, options);
         Validation.parent(the);
+        the[_rules] = {};
         // [{
         //   path: '字段',
         //   rules: [fn1, fn2]
@@ -50,39 +51,32 @@ var Validation = Events.extend({
         var options = the[_options];
         callback = fun.noop(callback);
         var errs = [];
-        var lastErrorPath = null;
 
-        howdo.each(the[_ruleGroup], function (_, ruleList, next) {
+        howdo.each(the[_ruleGroup], function (_1, ruleList, nextList) {
             // 不跳过已经非法的字段
             if (!options.skipInvalid && errs.length) {
-                return next();
+                return nextList();
             }
 
-            lastErrorPath = null;
-            howdo.each(ruleList.rules, function (__, arr, next) {
+            howdo.each(ruleList.rules, function (_2, arr, nextRule) {
                 var fn = arr[0];
                 var item = arr[1];
-
-                // 同一个字段，有一个规则验证非法即跳过
-                if (lastErrorPath === item.path) {
-                    return next();
-                }
-
                 var value = data[item.path];
 
                 item.value = value;
                 fn.call(item, value, function (message) {
                     if (message) {
-                        lastErrorPath = item.path;
                         item.message = message;
                         errs.push(item);
                         the.emit('invalid', item);
-                        return next(1);
+                        return nextRule(1);
                     }
 
-                    next();
+                    nextRule();
                 });
-            }).follow(next);
+            }).follow(function () {
+                nextList();
+            });
         }).follow(function () {
             callback(errs);
         });
@@ -122,7 +116,29 @@ var Validation = Events.extend({
             message: message
         };
 
-        the[_lastRuleList].rules.push([RULES[rule] || emptyRule, item]);
+        the[_lastRuleList].rules.push([
+            the[_rules][rule] || RULES[rule] || emptyRule,
+            item
+        ]);
+
+        return the;
+    },
+
+
+    /**
+     * 自定义实例级别的验证规则
+     * @param name {String} 规则名称
+     * @param [fn] {Function} 规则验证方法
+     * @returns {Validation}
+     */
+    rule: function (name, fn) {
+        var the = this;
+
+        if (!fn) {
+            return the[_rules][name];
+        }
+
+        the[_rules][name] = fn;
 
         return the;
     }
@@ -130,10 +146,20 @@ var Validation = Events.extend({
 var _options = Validation.sole();
 var _path = Validation.sole();
 var _alias = Validation.sole();
+var _rules = Validation.sole();
 var _ruleGroup = Validation.sole();
 var _lastRuleList = Validation.sole();
 
+/**
+ * 自定义静态级别的验证规则
+ * @param name {String} 规则名称
+ * @param [fn] {Function} 规则验证方法
+ */
 Validation.rule = function (name, fn) {
+    if (!fn) {
+        return RULES[name];
+    }
+
     RULES[name] = fn;
 };
 
