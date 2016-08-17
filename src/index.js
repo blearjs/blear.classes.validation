@@ -66,7 +66,7 @@ var Validation = Events.extend({
                 item.value = value;
                 fn.call(item, value, function (message) {
                     if (message) {
-                        item.message = message;
+                        item.message = item.message || message;
                         errs.push(item);
                         the.emit('invalid', item);
                         return nextRule(1);
