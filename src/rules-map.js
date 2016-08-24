@@ -12,7 +12,7 @@ var validator = require('blear.utils.validator');
 exports.required = function (value, next) {
     var item = this;
 
-    if (value.length === 0 && item.limit !== false) {
+    if (!value || value.length === 0 && item.limit !== false) {
         return next(item.alias + '不能为空');
     }
 
@@ -47,7 +47,7 @@ exports.type = function (value, next) {
 exports.min = function (value, next) {
     var item = this;
 
-    if (value < item.limit) {
+    if (!value || value < item.limit) {
         return next(item.alias + '不能小于' + item.limit);
     }
 
@@ -57,7 +57,7 @@ exports.min = function (value, next) {
 exports.max = function (value, next) {
     var item = this;
 
-    if (value > item.limit) {
+    if (!value || value > item.limit) {
         return next(item.alias + '不能大于' + item.limit);
     }
 
@@ -67,7 +67,7 @@ exports.max = function (value, next) {
 exports.minLength = function (value, next) {
     var item = this;
 
-    if (value.length < item.limit) {
+    if (!value || value.length < item.limit) {
         return next(item.alias + '长度不能小于' + item.limit);
     }
 
@@ -77,7 +77,7 @@ exports.minLength = function (value, next) {
 exports.maxLength = function (value, next) {
     var item = this;
 
-    if (value.length > item.limit) {
+    if (!value || value.length > item.limit) {
         return next(item.alias + '长度不能大于' + item.limit);
     }
 
