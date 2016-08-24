@@ -60,7 +60,7 @@ var Validation = Events.extend({
 
             howdo.each(ruleList.rules, function (_2, arr, nextRule) {
                 var fn = arr[0];
-                var item = arr[1];
+                var item = object.assign({}, arr[1]);
                 var value = data[item.path];
 
                 item.value = value;
