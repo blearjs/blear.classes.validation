@@ -64,6 +64,7 @@ var Validation = Events.extend({
                 var value = data[item.path];
 
                 item.value = value;
+                item.data = data;
                 fn.call(item, value, function (message) {
                     if (message) {
                         item.message = item.message || message;
@@ -109,7 +110,7 @@ var Validation = Events.extend({
     constrain: function (rule, limit, message) {
         var the = this;
         var item = {
-            name: rule,
+            rule: rule,
             path: the[_path],
             alias: the[_alias],
             limit: limit,

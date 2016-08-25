@@ -84,4 +84,14 @@ exports.maxLength = function (value, next) {
     next();
 };
 
+exports.pattern = function (value, next) {
+    var item = this;
+
+    if (!value || !item.limit.test(value)) {
+        return next(item.alias + '不符合规则');
+    }
+
+    next();
+};
+
 
