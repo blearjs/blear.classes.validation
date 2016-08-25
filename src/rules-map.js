@@ -9,10 +9,16 @@
 
 var validator = require('blear.utils.validator');
 
+
+var isEmpty = function (value) {
+    return value === undefined || value === null || value === '';
+};
+
+
 exports.required = function (value, next) {
     var item = this;
 
-    if ((value === undefined || value === null || value === '') && item.limit !== false) {
+    if (isEmpty(value) && item.limit !== false) {
         return next(item.alias + '不能为空');
     }
 
@@ -22,7 +28,7 @@ exports.required = function (value, next) {
 exports.type = function (value, next) {
     var item = this;
 
-    if (value === undefined) {
+    if (isEmpty(value)) {
         return next();
     }
 
@@ -51,7 +57,7 @@ exports.type = function (value, next) {
 exports.min = function (value, next) {
     var item = this;
 
-    if (value !== undefined && value < item.limit) {
+    if (!isEmpty(value) && value < item.limit) {
         return next(item.alias + '不能小于' + item.limit);
     }
 
@@ -61,7 +67,7 @@ exports.min = function (value, next) {
 exports.max = function (value, next) {
     var item = this;
 
-    if (value !== undefined && value > item.limit) {
+    if (!isEmpty(value) && value > item.limit) {
         return next(item.alias + '不能大于' + item.limit);
     }
 
@@ -71,7 +77,7 @@ exports.max = function (value, next) {
 exports.minLength = function (value, next) {
     var item = this;
 
-    if (value !== undefined && value.length < item.limit) {
+    if (!isEmpty(value) && value.length < item.limit) {
         return next(item.alias + '长度不能小于' + item.limit);
     }
 
@@ -81,7 +87,7 @@ exports.minLength = function (value, next) {
 exports.maxLength = function (value, next) {
     var item = this;
 
-    if (value !== undefined && value.length > item.limit) {
+    if (!isEmpty(value) && value.length > item.limit) {
         return next(item.alias + '长度不能大于' + item.limit);
     }
 
@@ -91,7 +97,7 @@ exports.maxLength = function (value, next) {
 exports.pattern = function (value, next) {
     var item = this;
 
-    if (value !== undefined && !item.limit.test(value)) {
+    if (!isEmpty(value) && !item.limit.test(value)) {
         return next(item.alias + '不符合规则');
     }
 
