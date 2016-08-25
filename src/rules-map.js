@@ -12,7 +12,7 @@ var validator = require('blear.utils.validator');
 exports.required = function (value, next) {
     var item = this;
 
-    if (!value || value.length === 0 && item.limit !== false) {
+    if ((value === undefined || value === null || value === '') && item.limit !== false) {
         return next(item.alias + '不能为空');
     }
 
@@ -21,6 +21,10 @@ exports.required = function (value, next) {
 
 exports.type = function (value, next) {
     var item = this;
+
+    if (value === undefined) {
+        return next();
+    }
 
     switch (item.limit) {
         case 'mobile':
@@ -47,7 +51,7 @@ exports.type = function (value, next) {
 exports.min = function (value, next) {
     var item = this;
 
-    if (!value || value < item.limit) {
+    if (value !== undefined && value < item.limit) {
         return next(item.alias + '不能小于' + item.limit);
     }
 
@@ -57,7 +61,7 @@ exports.min = function (value, next) {
 exports.max = function (value, next) {
     var item = this;
 
-    if (!value || value > item.limit) {
+    if (value !== undefined && value > item.limit) {
         return next(item.alias + '不能大于' + item.limit);
     }
 
@@ -67,7 +71,7 @@ exports.max = function (value, next) {
 exports.minLength = function (value, next) {
     var item = this;
 
-    if (!value || value.length < item.limit) {
+    if (value !== undefined && value.length < item.limit) {
         return next(item.alias + '长度不能小于' + item.limit);
     }
 
@@ -77,7 +81,7 @@ exports.minLength = function (value, next) {
 exports.maxLength = function (value, next) {
     var item = this;
 
-    if (!value || value.length > item.limit) {
+    if (value !== undefined && value.length > item.limit) {
         return next(item.alias + '长度不能大于' + item.limit);
     }
 
@@ -87,7 +91,7 @@ exports.maxLength = function (value, next) {
 exports.pattern = function (value, next) {
     var item = this;
 
-    if (!value || !item.limit.test(value)) {
+    if (value !== undefined && !item.limit.test(value)) {
         return next(item.alias + '不符合规则');
     }
 
