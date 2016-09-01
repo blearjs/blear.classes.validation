@@ -114,4 +114,21 @@ describe('测试文件', function () {
             done();
         });
     });
+
+    it('limit:function', function (done) {
+        var va = new Validation();
+
+        va.path('a');
+        va.path('b').constrain('max', function (data) {
+            return data.a;
+        }, 'b不能大于a');
+
+        va.validate({
+            a: 10,
+            b: 20
+        }, function (errs) {
+            console.log(errs[0]);
+            done();
+        });
+    });
 });

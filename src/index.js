@@ -11,6 +11,7 @@
 var Events = require('blear.classes.events');
 var object = require('blear.utils.object');
 var howdo = require('blear.utils.howdo');
+var typeis = require('blear.utils.typeis');
 var fun = require('blear.utils.function');
 
 var rulesMap = require('./rules-map.js');
@@ -61,11 +62,13 @@ var Validation = Events.extend({
 
             howdo.each(ruleList.rules, function (_2, arr, nextRule) {
                 var fn = arr[0];
-                var item = object.assign({}, arr[1]);
+                var origin = arr[1];
+                var item = object.assign({}, origin);
                 var value = data[item.path];
 
                 item.value = value;
                 item.data = data;
+                item.limit = typeis.Function(origin.limit) ? origin.limit.call(item, data) : item.limit;
                 fn.call(item, value, function (message) {
                     if (message) {
                         item.message = item.message || message;
