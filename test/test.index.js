@@ -99,4 +99,19 @@ describe('测试文件', function () {
             done();
         });
     }, 100000);
+
+    it('equal', function (done) {
+        var va = new Validation();
+
+        va.path('password', '密码').constrain('required', true);
+        va.path('password2', '确认密码').constrain('equal', 'password');
+
+        va.validate({
+            password: '123',
+            password2: ''
+        }, function (errs) {
+            console.log(errs[0]);
+            done();
+        });
+    });
 });

@@ -33,6 +33,7 @@ var Validation = Events.extend({
         the[_options] = object.assign({}, defaults, options);
         Validation.parent(the);
         the[_rules] = {};
+        the[_aliases] = {};
         // [{
         //   path: '字段',
         //   rules: [fn1, fn2]
@@ -94,7 +95,7 @@ var Validation = Events.extend({
         var the = this;
         the[_ruleGroup].push(the[_lastRuleList] = {
             path: the[_path] = path,
-            alias: the[_alias] = alias || path,
+            alias: the[_aliases][path] = the[_alias] = alias || path,
             rules: []
         });
         return the;
@@ -114,7 +115,8 @@ var Validation = Events.extend({
             path: the[_path],
             alias: the[_alias],
             limit: limit,
-            message: message
+            message: message,
+            aliases: the[_aliases]
         };
 
         the[_lastRuleList].rules.push([
@@ -147,6 +149,7 @@ var Validation = Events.extend({
 var _options = Validation.sole();
 var _path = Validation.sole();
 var _alias = Validation.sole();
+var _aliases = Validation.sole();
 var _rules = Validation.sole();
 var _ruleGroup = Validation.sole();
 var _lastRuleList = Validation.sole();

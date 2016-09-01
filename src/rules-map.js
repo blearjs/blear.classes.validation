@@ -104,4 +104,17 @@ exports.pattern = function (value, next) {
     next();
 };
 
+exports.equal = function (value, next) {
+    var item = this;
+    var equalPath = item.limit;
+    var equalValue = item.data[equalPath];
+
+    if (value !== equalValue) {
+        return next(item.alias + '必须与' + item.aliases[equalPath] + '相同');
+    }
+
+    next();
+};
+
+
 
