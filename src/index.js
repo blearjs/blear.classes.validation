@@ -16,6 +16,9 @@ var fun = require('blear.utils.function');
 
 var rulesMap = require('./rules-map.js');
 var RULES = {};
+var emptyUseful = function () {
+    return true;
+};
 var emptyRule = function (value, done) {
     done();
 };
@@ -24,7 +27,7 @@ var defaults = {
      * 是否跳过非法验证继续后面的验证
      * @type Boolean
      */
-    skipInvalid: true
+    skipInvalid: false
 };
 var Validation = Events.extend({
     className: 'Validation',
@@ -37,9 +40,11 @@ var Validation = Events.extend({
         the[_aliases] = {};
         // [{
         //   path: '字段',
-        //   rules: [fn1, fn2]
+        //   alias: '别名',
+        //   rules: [fn1, fn2],
+        //   useful: true
         // }]
-        the[_ruleGroup] = [];
+        the[_constrainGroup] = [];
     },
 
 
@@ -54,13 +59,20 @@ var Validation = Events.extend({
         callback = fun.noop(callback);
         var errs = [];
 
-        howdo.each(the[_ruleGroup], function (_1, ruleList, nextList) {
+        howdo.each(the[_constrainGroup], function (_1, constrains, nextList) {
             // 不跳过已经非法的字段
             if (!options.skipInvalid && errs.length) {
                 return nextList();
             }
 
-            howdo.each(ruleList.rules, function (_2, arr, nextRule) {
+            // 验证不可用
+            var useful = constrains.useful(constrains.path, data);
+
+            if (!useful) {
+                return nextList();
+            }
+
+            howdo.each(constrains.rules, function (_2, arr, nextRule) {
                 var fn = arr[0];
                 var origin = arr[1];
                 var item = object.assign({}, origin);
@@ -96,10 +108,11 @@ var Validation = Events.extend({
      */
     path: function (path, alias) {
         var the = this;
-        the[_ruleGroup].push(the[_lastRuleList] = {
+        the[_constrainGroup].push(the[_lastConstrain] = {
             path: the[_path] = path,
             alias: the[_aliases][path] = the[_alias] = alias || path,
-            rules: []
+            rules: [],
+            useful: emptyUseful
         });
         return the;
     },
@@ -122,7 +135,7 @@ var Validation = Events.extend({
             aliases: the[_aliases]
         };
 
-        the[_lastRuleList].rules.push([
+        the[_lastConstrain].rules.push([
             the[_rules][rule] || RULES[rule] || emptyRule,
             item
         ]);
@@ -147,6 +160,23 @@ var Validation = Events.extend({
         the[_rules][name] = fn;
 
         return the;
+    },
+
+    /**
+     * 指定字段约束是否使用
+     * @param {Boolean|Function} fn
+     */
+    useful: function (fn) {
+        var the = this;
+
+        if (typeis.Boolean(fn)) {
+            fn = function () {
+                return fn;
+            };
+        }
+
+        the[_lastConstrain].useful = fn;
+        return the;
     }
 });
 var _options = Validation.sole();
@@ -154,8 +184,9 @@ var _path = Validation.sole();
 var _alias = Validation.sole();
 var _aliases = Validation.sole();
 var _rules = Validation.sole();
-var _ruleGroup = Validation.sole();
-var _lastRuleList = Validation.sole();
+var _constrainGroup = Validation.sole();
+var _lastConstrain = Validation.sole();
+var _usefulList = Validation.sole();
 
 /**
  * 自定义静态级别的验证规则

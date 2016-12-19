@@ -74,11 +74,21 @@ exports.max = function (value, next) {
     next();
 };
 
+exports.length = function (value, next) {
+    var item = this;
+
+    if (!isEmpty(value) && value.length < item.limit) {
+        return next(item.alias + '的长度必须为 ' + item.limit);
+    }
+
+    next();
+};
+
 exports.minLength = function (value, next) {
     var item = this;
 
     if (!isEmpty(value) && value.length < item.limit) {
-        return next(item.alias + '长度不能小于' + item.limit);
+        return next(item.alias + '的长度不能小于 ' + item.limit);
     }
 
     next();
@@ -88,7 +98,7 @@ exports.maxLength = function (value, next) {
     var item = this;
 
     if (!isEmpty(value) && value.length > item.limit) {
-        return next(item.alias + '长度不能大于' + item.limit);
+        return next(item.alias + '的长度不能大于 ' + item.limit);
     }
 
     next();
