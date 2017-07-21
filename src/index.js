@@ -66,7 +66,7 @@ var Validation = Events.extend({
             }
 
             // 验证不可用
-            var useful = constrains.useful(constrains.path, data);
+            var useful = constrains.useful(data);
 
             if (!useful) {
                 return nextList();
