@@ -1,6 +1,6 @@
 {
   "name": "blear.classes.validation",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "通用的数据验证",
   "scripts": {
     "live": "browser-sync start --config bs-config.js",
@@ -38,13 +38,13 @@
   "dependencies": {
     "blear.classes.events": "1.x",
     "blear.core.ajax": "1.x",
-    "blear.utils.typeis": "1.x",
-    "blear.utils.array": "1.x",
-    "blear.utils.howdo": "1.x",
-    "blear.utils.object": "1.x",
-    "blear.utils.string": "1.x",
     "blear.utils.access": "1.x",
+    "blear.utils.array": "1.x",
     "blear.utils.function": "1.x",
+    "blear.utils.object": "1.x",
+    "blear.utils.plan": "^2.1.2",
+    "blear.utils.string": "1.x",
+    "blear.utils.typeis": "1.x",
     "blear.utils.validator": "1.x"
   },
   "peerDependencies": {},

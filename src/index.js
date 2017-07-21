@@ -10,7 +10,7 @@
 
 var Events = require('blear.classes.events');
 var object = require('blear.utils.object');
-var howdo = require('blear.utils.howdo');
+var plan = require('blear.utils.plan');
 var typeis = require('blear.utils.typeis');
 var fun = require('blear.utils.function');
 
@@ -59,7 +59,7 @@ var Validation = Events.extend({
         callback = fun.noop(callback);
         var errs = [];
 
-        howdo.each(the[_constrainGroup], function (_1, constrains, nextList) {
+        plan.each(the[_constrainGroup], function (_1, constrains, nextList) {
             // 不跳过已经非法的字段
             if (!options.skipInvalid && errs.length) {
                 return nextList();
@@ -75,7 +75,7 @@ var Validation = Events.extend({
                 return nextList();
             }
 
-            howdo.each(constrains.rules, function (_2, arr, nextRule) {
+            plan.each(constrains.rules, function (_2, arr, nextRule) {
                 var fn = arr[0];
                 var origin = arr[1];
                 var item = object.assign({}, origin);
@@ -93,10 +93,10 @@ var Validation = Events.extend({
 
                     nextRule();
                 });
-            }).follow(function () {
+            }).serial(function () {
                 nextList();
             });
-        }).follow(function () {
+        }).serial(function () {
             callback(errs);
         });
     },
