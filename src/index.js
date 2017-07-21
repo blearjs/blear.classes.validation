@@ -56,7 +56,7 @@ var Validation = Events.extend({
     validate: function (data, callback) {
         var the = this;
         var options = the[_options];
-        callback = fun.noop(callback);
+        callback = fun.ensure(callback);
         var errs = [];
 
         plan.each(the[_constrainGroup], function (_1, constrains, nextList) {

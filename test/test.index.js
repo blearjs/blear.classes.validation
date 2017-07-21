@@ -27,7 +27,7 @@ describe('测试文件', function () {
         });
 
         va.on('invalid', function (invalid) {
-            console.log('invalid',invalid);
+            console.log('invalid', invalid);
         });
     });
 
@@ -118,7 +118,6 @@ describe('测试文件', function () {
     it('limit:function', function (done) {
         var va = new Validation();
 
-        va.path('a');
         va.path('b').constrain('max', function (data) {
             return data.a;
         }, 'b不能大于a');
@@ -128,6 +127,62 @@ describe('测试文件', function () {
             b: 20
         }, function (errs) {
             console.log(errs[0]);
+            done();
+        });
+    });
+
+    it('rule', function (done) {
+        var va = new Validation();
+
+        va.rule('x', function (value, next) {
+            if (value === '123') {
+                return next();
+            }
+
+            next('必须等于 123');
+        });
+
+        va.path('a').constrain('x', true);
+        va.validate({
+            a: '1'
+        }, function (errs) {
+            expect(errs.length).toBe(1);
+            done();
+        });
+    });
+
+    it('useful - 1', function (done) {
+        var va = new Validation();
+
+        va
+            .path('a')
+            .useful(function (value) {
+                return value === '0';
+            })
+            .constrain('minLength', 2);
+
+        va.validate({
+            a: '1'
+        }, function (errs) {
+            expect(errs.length).toBe(0);
+            done();
+        });
+    });
+
+    it('useful - 2', function (done) {
+        var va = new Validation();
+
+        va
+            .path('a')
+            .useful(function (value) {
+                return value === '0';
+            })
+            .constrain('minLength', 2);
+
+        va.validate({
+            a: '0'
+        }, function (errs) {
+            expect(errs.length).toBe(1);
             done();
         });
     });
