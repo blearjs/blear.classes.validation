@@ -65,8 +65,11 @@ var Validation = Events.extend({
                 return nextList();
             }
 
+            var path = constrains.path;
+            var value = data[path];
             // 验证不可用
-            var useful = constrains.useful(data);
+            constrains.data = data;
+            var useful = constrains.useful(value);
 
             if (!useful) {
                 return nextList();
@@ -76,7 +79,6 @@ var Validation = Events.extend({
                 var fn = arr[0];
                 var origin = arr[1];
                 var item = object.assign({}, origin);
-                var value = data[item.path];
 
                 item.value = value;
                 item.data = data;
@@ -112,7 +114,8 @@ var Validation = Events.extend({
             path: the[_path] = path,
             alias: the[_aliases][path] = the[_alias] = alias || path,
             rules: [],
-            useful: emptyUseful
+            useful: emptyUseful,
+            data: null
         });
         return the;
     },
