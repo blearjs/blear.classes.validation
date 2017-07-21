@@ -151,6 +151,51 @@ describe('测试文件', function () {
         });
     });
 
+    it('empty rule', function (done) {
+        var va = new Validation();
+        va.path('a').constrain('-----', true);
+
+        va.validate({a: 1}, function (errs) {
+            expect(errs.length).toBe(0);
+            done();
+        });
+    });
+
+    it('static rule', function (done) {
+        var ruleName = 'r' + Date.now();
+        var rule = function (value, next) {
+            if (/^[a-z][a-z\d]4$/.test(value)) {
+                return next();
+            }
+
+            next('invalid');
+        };
+
+        Validation.rule(ruleName, rule);
+        expect(Validation.rule(ruleName)).toBe(rule);
+
+        var va = new Validation();
+        va.path('a').constrain(ruleName, true);
+
+        va.validate({
+            a: 'a'
+        }, function (errs) {
+            expect(errs.length).toBe(1);
+            done();
+        });
+    });
+
+    it('get rule', function () {
+        var va = new Validation();
+        var rule = function (value, next) {
+            next();
+        };
+
+        va.rule('a', rule);
+
+        expect(va.rule('a')).toBe(rule);
+    });
+
     it('useful - 1', function (done) {
         var va = new Validation();
 
@@ -174,9 +219,7 @@ describe('测试文件', function () {
 
         va
             .path('a')
-            .useful(function (value) {
-                return value === '0';
-            })
+            .useful(true)
             .constrain('minLength', 2);
 
         va.validate({
