@@ -11,7 +11,8 @@ var validator = require('blear.utils.validator');
 
 
 var isEmpty = function (value) {
-    return value === undefined || value === null || value === '';
+    // 字符串或者数组
+    return value === undefined || value === null || value.length === 0;
 };
 
 
