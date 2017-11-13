@@ -50,6 +50,9 @@ exports.type = function (value, next) {
         case 'http':
             return next(validator.isHTTP(value) ? null : '网络地址不合法');
 
+        case 'idNo':
+            return next(validator.isIdNo(value) ? null : '身份证号码不合法');
+
         default:
             next();
     }

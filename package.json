@@ -1,6 +1,6 @@
 {
   "name": "blear.classes.validation",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "通用的数据验证",
   "scripts": {
     "live": "browser-sync start --config bs-config.js",
@@ -45,7 +45,7 @@
     "blear.utils.plan": "^2.1.2",
     "blear.utils.string": "1.x",
     "blear.utils.typeis": "1.x",
-    "blear.utils.validator": "1.x"
+    "blear.utils.validator": "^1.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {
