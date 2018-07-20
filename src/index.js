@@ -85,7 +85,13 @@ var Validation = Events.extend({
                 item.limit = typeis.Function(origin.limit) ? origin.limit.call(item, data) : item.limit;
                 fn.call(item, value, function (message) {
                     if (message) {
-                        item.message = item.message || message;
+                        var itemMessage = item.message;
+
+                        if (typeis.Function(itemMessage)) {
+                            itemMessage = itemMessage.call(item, data);
+                        }
+
+                        item.message = itemMessage || message;
                         errs.push(item);
                         the.emit('invalid', item);
                         return nextRule(1);
