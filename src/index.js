@@ -25,6 +25,8 @@ var emptyRule = function (value, done) {
 var defaults = {
     /**
      * 是否跳过非法验证继续后面的验证
+     * true：出错继续验证后面的数据（可能会有多个错误结果）
+     * false：出错就不再继续验证（最多只可能一个错误结果）
      * @type Boolean
      */
     skipInvalid: false
@@ -54,14 +56,15 @@ var Validation = Events.extend({
      * @param [callback] {Function} 验证回调
      */
     validate: function (data, callback) {
+        callback = fun.ensure(callback);
         var the = this;
         var options = the[_options];
-        callback = fun.ensure(callback);
+        var skipInvalid = options.skipInvalid;
         var errs = [];
 
         plan.each(the[_constrainGroup], function (_1, constrains, nextList) {
             // 不跳过已经非法的字段
-            if (!options.skipInvalid && errs.length) {
+            if (!skipInvalid && errs.length) {
                 return nextList();
             }
 
@@ -103,7 +106,7 @@ var Validation = Events.extend({
                 nextList();
             });
         }).serial(function () {
-            callback(errs);
+            callback(skipInvalid ? errs : errs[0]);
         });
     },
 
