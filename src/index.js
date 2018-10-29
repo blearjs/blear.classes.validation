@@ -13,15 +13,8 @@ var object = require('blear.utils.object');
 var plan = require('blear.utils.plan');
 var typeis = require('blear.utils.typeis');
 var fun = require('blear.utils.function');
+var access = require('blear.utils.access');
 
-var rulesMap = require('./rules-map.js');
-var RULES = {};
-var emptyUseful = function () {
-    return true;
-};
-var emptyRule = function (value, done) {
-    done();
-};
 var defaults = {
     /**
      * 是否跳过非法验证继续后面的验证
@@ -31,191 +24,375 @@ var defaults = {
      */
     skipInvalid: false
 };
+var staticRules = {};
 var Validation = Events.extend({
     className: 'Validation',
+
+    /**
+     * 实例化
+     * @param [options]
+     */
     constructor: function (options) {
         var the = this;
 
         the[_options] = object.assign({}, defaults, options);
-        Validation.parent(the);
-        the[_rules] = {};
+        the[_fields] = [];
         the[_aliases] = {};
-        // [{
-        //   path: '字段',
-        //   alias: '别名',
-        //   rules: [fn1, fn2],
-        //   useful: true
-        // }]
-        the[_constrainGroup] = [];
+        the[_instanceRules] = object.assign({}, staticRules);
     },
 
-
     /**
-     * 验证数据
-     * @param data {Object} 待验证的数据
-     * @param [callback] {Function} 验证回调
-     */
-    validate: function (data, callback) {
-        callback = fun.ensure(callback);
-        var the = this;
-        var options = the[_options];
-        var skipInvalid = options.skipInvalid;
-        var errs = [];
-
-        plan.each(the[_constrainGroup], function (_1, constrains, nextList) {
-            // 不跳过已经非法的字段
-            if (!skipInvalid && errs.length) {
-                return nextList();
-            }
-
-            var path = constrains.path;
-            var value = data[path];
-            // 验证不可用
-            constrains.data = data;
-            var useful = constrains.useful(value);
-
-            if (!useful) {
-                return nextList();
-            }
-
-            plan.each(constrains.rules, function (_2, arr, nextRule) {
-                var fn = arr[0];
-                var origin = arr[1];
-                var item = object.assign({}, origin);
-
-                item.value = value;
-                item.data = data;
-                item.limit = typeis.Function(origin.limit) ? origin.limit.call(item, data) : item.limit;
-                fn.call(item, value, function (message) {
-                    if (message) {
-                        var itemMessage = item.message;
-
-                        if (typeis.Function(itemMessage)) {
-                            itemMessage = itemMessage.call(item, data);
-                        }
-
-                        item.message = itemMessage || message;
-                        errs.push(item);
-                        the.emit('invalid', item);
-                        return nextRule(1);
-                    }
-
-                    nextRule();
-                });
-            }).serial(function () {
-                nextList();
-            });
-        }).serial(function () {
-            callback(skipInvalid ? errs : errs[0]);
-        });
-    },
-
-
-    /**
-     * 指定字段
-     * @param path {String} 字段
-     * @param [alias] {String} 别名
+     * 定义验证字段
+     * @todo 嵌套验证
+     * @param name
+     * @param alias
      * @returns {Validation}
      */
-    path: function (path, alias) {
+    field: function (name, alias) {
         var the = this;
-        the[_constrainGroup].push(the[_lastConstrain] = {
-            path: the[_path] = path,
-            alias: the[_aliases][path] = the[_alias] = alias || path,
-            rules: [],
-            useful: emptyUseful,
-            data: null
-        });
+
+        if (the[_currentField]) {
+            the[_fields].push(the[_currentField]);
+        }
+
+        the[_currentField] = the[_buildField](name, alias);
         return the;
     },
 
     /**
-     * 约束条件
-     * @param rule {String} 规则名称
+     * 设置字段是否有效
+     * @param useful
+     * @returns {Validation}
+     */
+    useful: function (useful) {
+        var the = this;
+        the[_currentField].useful = typeis.Function(useful) ? useful : function () {
+            return Boolean(useful);
+        };
+        return the;
+    },
+
+    /**
+     * 自定义实例级别规则
+     * @param rule {string} 规则名称
+     * @param [validator] {function} 规则函数
+     * @returns {Validation}
+     */
+    rule: function (rule, validator) {
+        var the = this;
+
+        if (!validator) {
+            return the[_instanceRules][rule];
+        }
+
+        the[_instanceRules][rule] = validator;
+        return the;
+    },
+
+    /**
+     * 限制
+     * @param rule {string|function} 限制（静态、实例）规则，或函数
      * @param limit {*} 规则限制条件
-     * @param [message] {String} 超过规则限制的消息
+     * @param [message] {string} 超过规则限制的消息
      * @returns {Validation}
      */
     constrain: function (rule, limit, message) {
         var the = this;
-        var item = {
-            rule: rule,
-            path: the[_path],
-            alias: the[_alias],
-            limit: limit,
-            message: message,
-            aliases: the[_aliases]
-        };
-
-        the[_lastConstrain].rules.push([
-            the[_rules][rule] || RULES[rule] || emptyRule,
-            item
-        ]);
-
+        the[_currentField].constraints.push(
+            the[_buildConstraint](rule, limit, message)
+        );
         return the;
     },
 
-
     /**
-     * 自定义实例级别的验证规则
-     * @param name {String} 规则名称
-     * @param [fn] {Function} 规则验证方法
+     * 字段类型
      * @returns {Validation}
      */
-    rule: function (name, fn) {
-        var the = this;
-
-        if (!fn) {
-            return the[_rules][name];
-        }
-
-        the[_rules][name] = fn;
-
-        return the;
+    trim: function () {
+        return this.constrain('trim', true);
     },
 
     /**
-     * 指定字段约束是否使用
-     * @param {Boolean|Function} fn
+     * 字段类型
+     * @param type {string} 类型
+     * @param [message] {string} 消息
+     * @returns {Validation}
      */
-    useful: function (fn) {
-        var the = this;
+    type: function (type, message) {
+        return this.constrain('type', type, message);
+    },
 
-        if (typeis.Boolean(fn)) {
-            fn = function () {
-                return fn;
-            };
+    /**
+     * 字段类型
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    required: function (message) {
+        return this.constrain('required', true, message);
+    },
+
+    /**
+     * 字段类型
+     * @param minLength {number} 最小长度
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    minLength: function (minLength, message) {
+        return this.constrain('minLength', minLength, message);
+    },
+
+    /**
+     * 字段类型
+     * @param maxLength {number} 最大长度
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    maxLength: function (maxLength, message) {
+        return this.constrain('maxLength', maxLength, message);
+    },
+
+    /**
+     * 字段类型
+     * @param min {number} 最小值
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    min: function (min, message) {
+        return this.constrain('min', min, message);
+    },
+
+    /**
+     * 字段类型
+     * @param max {number} 最大值
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    max: function (max, message) {
+        return this.constrain('max', max, message);
+    },
+
+    /**
+     * 字段类型
+     * @param field {string} 字段
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    equal: function (field, message) {
+        return this.constrain('equal', field, message);
+    },
+
+    /**
+     * 字段类型
+     * @param pattern {regexp} 正则表达式
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    pattern: function (pattern, message) {
+        return this.constrain('pattern', pattern, message);
+    },
+
+    /**
+     * 表单验证
+     * @param data
+     * @param callback
+     */
+    validate: function (data, callback) {
+        var the = this;
+        var errs = [];
+        var skipInvalid = the[_options].skipInvalid;
+
+        if (the[_currentField]) {
+            the[_fields].push(the[_currentField]);
+            the[_currentField] = null;
         }
 
-        the[_lastConstrain].useful = fn;
-        return the;
+        plan
+            .each(the[_fields], function (index, field, next) {
+                var build = the[_buildContext](field, data);
+                plan
+                    .each(field.constraints, function (index, constraint, next) {
+                        var context = build(constraint);
+                        the[_execValidate](context, constraint, function (err) {
+                            if (!err) {
+                                return next();
+                            }
+
+                            errs.push(err);
+
+                            if (skipInvalid) {
+                                return next();
+                            }
+
+                            next(1);
+                        });
+                    })
+                    .serial(next);
+            })
+            .serial(function (err) {
+                if (skipInvalid) {
+                    return callback(errs, data);
+                }
+
+                callback(errs[0], data);
+            });
     }
 });
-var _options = Validation.sole();
-var _path = Validation.sole();
-var _alias = Validation.sole();
-var _aliases = Validation.sole();
-var _rules = Validation.sole();
-var _constrainGroup = Validation.sole();
-var _lastConstrain = Validation.sole();
-var _usefulList = Validation.sole();
+var sole = Validation.sole;
+var _options = sole();
+var _fields = sole();
+var _instanceRules = sole();
+var _currentField = sole();
+var _aliases = sole();
+var _buildField = sole();
+var _buildConstraint = sole();
+var _buildContext = sole();
+var _execValidate = sole();
+var proto = Validation.prototype;
 
 /**
- * 自定义静态级别的验证规则
- * @param name {String} 规则名称
- * @param [fn] {Function} 规则验证方法
+ * 自定义静态规则
+ * @param rule {string} 规则名称
+ * @param [validator] {function} 规则函数
  */
-Validation.rule = function (name, fn) {
-    if (!fn) {
-        return RULES[name];
+Validation.rule = function (rule, validator) {
+    if (!validator) {
+        return staticRules[rule];
     }
 
-    RULES[name] = fn;
+    staticRules[rule] = validator;
 };
 
-object.each(rulesMap, function (name, fn) {
-    RULES[name] = fn;
-});
+staticRules.trim = require('./rules/trim');
+staticRules.type = require('./rules/type');
+staticRules.required = require('./rules/required');
 
-Validation.defaults = defaults;
 module.exports = Validation;
+
+// ======================================================
+// ======================================================
+// ======================================================
+
+/**
+ * 构建字段
+ * @param name
+ * @param alias
+ * @returns {{name: *, alias: *, useful: (function(): boolean), constraints: Array}}
+ */
+proto[_buildField] = function (name, alias) {
+    var the = this;
+
+    return {
+        name: name,
+        alias: the[_aliases][name] = alias || name,
+        useful: function () {
+            return true;
+        },
+        constraints: []
+    };
+};
+
+/**
+ * 构建验证器
+ * @param rule
+ * @param limit
+ * @param message
+ * @returns {{rule: *, validator: *, limit: *, message: *}}
+ */
+proto[_buildConstraint] = function (rule, limit, message) {
+    var the = this;
+    var args = access.args(arguments);
+    var validator;
+
+    if (typeis.Function(args[0])) {
+        validator = args[0];
+    } else {
+        validator = the[_instanceRules][args[0]];
+    }
+
+    validator = validator || function () {
+        return true;
+    };
+
+    return {
+        rule: rule,
+        validator: validator,
+        limit: limit,
+        message: message
+    };
+};
+
+/**
+ * 执行验证
+ * @param context
+ * @param constraint
+ * @param callback
+ */
+proto[_execValidate] = function (context, constraint, callback) {
+    var errWith = function (err) {
+        context.message = err.message;
+        err.validation = context;
+        return err;
+    };
+    var next = function (message) {
+        if (message === true) {
+            return callback();
+        }
+
+        if (message === false) {
+            return callback(errWith(new Error(context.message)));
+        }
+
+        if (message instanceof Error) {
+            return callback(errWith(message));
+        }
+
+        message = message && message.message || message;
+
+        if (typeis.String(message) && message) {
+            return callback(errWith(new Error(message)));
+        }
+
+        callback();
+    };
+    var validator = constraint.validator;
+
+    if (validator.length >= 2) {
+        validator.call(context, context.value, next);
+    } else {
+        next(validator.call(context, context.value));
+    }
+};
+
+/**
+ * 构建上下文
+ * @param field
+ * @param field.name
+ * @param field.alias
+ * @param data
+ * @returns {function(*): {name: (Validation.field|(function(*=, *=): Validation)|*), alias: *, value: *}}
+ */
+proto[_buildContext] = function (field, data) {
+    var the = this;
+    var name = field.name;
+    var context = {
+        name: name,
+        aliases: the[_aliases],
+        alias: field.alias,
+        value: data[name],
+        data: data
+    };
+
+    /**
+     * 构建上下文
+     * @param constraint
+     * @param constraint.limit
+     * @param constraint.message
+     * @param constraint.rule
+     */
+    return function (constraint) {
+        context.limit = constraint.limit;
+        context.message = constraint.message;
+        context.rule = constraint.rule;
+        return context;
+    }
+};
