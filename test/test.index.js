@@ -20,9 +20,14 @@ describe('测试文件', function () {
 
         va.validate({
             username: '1234567890'
-        }, function (errs) {
-            expect(errs.length).toEqual(1);
-            console.log(errs);
+        }, function (err) {
+            expect(err.length).toEqual(undefined);
+            expect(err.path).toEqual('username');
+            expect(err.alias).toEqual('用户名');
+            expect(err.rule).toEqual('maxLength');
+            expect(err.limit).toEqual(8);
+            expect(err.value).toEqual('1234567890');
+            console.log(err);
             done();
         });
 
@@ -76,9 +81,9 @@ describe('测试文件', function () {
         va.validate({
             username: 'a',
             password: 'b'
-        }, function (errs) {
-            console.log(errs);
-            expect(errs.length).toEqual(1);
+        }, function (err) {
+            console.log(err);
+            expect(err.length).toEqual(undefined);
             done();
         });
     });
@@ -88,14 +93,14 @@ describe('测试文件', function () {
 
         va.rule('custormRule', function (value, next) {
             setTimeout(function () {
-                next('我不想多说什么，超时丢给你的错误，你接着');
+                next('123-456');
             }, 345);
         });
         va.path('abc').constrain('custormRule', true);
 
-        va.validate({abc: '1'}, function (errs) {
-            console.log(errs);
-            expect(errs.length).toEqual(1);
+        va.validate({abc: '1'}, function (err) {
+            console.log(err);
+            expect(err.message).toEqual('123-456');
             done();
         });
     }, 100000);
@@ -163,8 +168,8 @@ describe('测试文件', function () {
         va.path('a').constrain('x', true);
         va.validate({
             a: '1'
-        }, function (errs) {
-            expect(errs.length).toBe(1);
+        }, function (err) {
+            expect(err.message).toBe('必须等于 123');
             done();
         });
     });
@@ -173,8 +178,8 @@ describe('测试文件', function () {
         var va = new Validation();
         va.path('a').constrain('-----', true);
 
-        va.validate({a: 1}, function (errs) {
-            expect(errs.length).toBe(0);
+        va.validate({a: 1}, function (err) {
+            expect(err).toBeFalsy();
             done();
         });
     });
@@ -197,8 +202,8 @@ describe('测试文件', function () {
 
         va.validate({
             a: 'a'
-        }, function (errs) {
-            expect(errs.length).toBe(1);
+        }, function (err) {
+            expect(err.message).toBe('invalid');
             done();
         });
     });
@@ -220,14 +225,14 @@ describe('测试文件', function () {
         va
             .path('a')
             .useful(function (value) {
-                return value === '0';
+                return false;
             })
             .constrain('minLength', 2);
 
         va.validate({
             a: '1'
-        }, function (errs) {
-            expect(errs.length).toBe(0);
+        }, function (err) {
+            expect(err).toBeFalsy();
             done();
         });
     });
@@ -242,8 +247,8 @@ describe('测试文件', function () {
 
         va.validate({
             a: '0'
-        }, function (errs) {
-            expect(errs.length).toBe(1);
+        }, function (err) {
+            expect(err).toBeTruthy();
             done();
         });
     });
