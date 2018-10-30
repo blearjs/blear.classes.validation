@@ -10,25 +10,25 @@
 
 var Validation = require('../../src/index.js');
 
-describe('min', function () {
+describe('max-length', function () {
 
     it('basic', function (done) {
         var va = new Validation({
             skipInvalid: true
         });
 
-        va.field('a').type('numerical').min(100);
-        va.field('b').type('numerical').min(100, '100最小了');
-        va.field('c').type('numerical').min(100);
+        va.field('a').maxLength(3);
+        va.field('b').maxLength(3, '最多三位');
+        va.field('c').maxLength(3);
 
         va.validate({
-            a: 12,
-            b: 12,
-            c: 199
+            a: '123123',
+            b: '123123',
+            c: '123'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 不能小于 100');
-            expect(errs[1].message).toBe('100最小了');
+            expect(errs[0].message).toBe('a 不能超过 3 个长度');
+            expect(errs[1].message).toBe('最多三位');
             done();
         });
     });
