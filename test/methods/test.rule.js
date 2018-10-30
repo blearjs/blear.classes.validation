@@ -71,4 +71,45 @@ describe('#rule', function () {
         });
     });
 
+    it('未定义的 rule', function (done) {
+        var va = new Validation();
+
+        va.field('a').constrain('r' + Math.random());
+
+        va.validate({}, function (err) {
+            expect(err).toBeFalsy();
+            done();
+        });
+    });
+
+    it('validatior 返回 Error', function (done) {
+        var va = new Validation();
+
+        var rule = 'r' + Math.random();
+        va.rule(rule, function (value) {
+            return new Error('r');
+        });
+        va.field('a').constrain(rule);
+
+        va.validate({}, function (err) {
+            expect(err.message).toBe('r');
+            done();
+        });
+    });
+
+    it('validatior callback', function (done) {
+        var va = new Validation();
+
+        var rule = 'r' + Math.random();
+        va.rule(rule, function (value, next) {
+            next(new Error('r'));
+        });
+        va.field('a').constrain(rule);
+
+        va.validate({}, function (err) {
+            expect(err.message).toBe('r');
+            done();
+        });
+    });
+
 });

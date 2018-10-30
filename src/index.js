@@ -173,12 +173,12 @@ var Validation = Events.extend({
 
     /**
      * 字段类型
-     * @param field {string} 字段
+     * @param name {string} 字段
      * @param [message] {string} 消息
      * @returns {Validation}
      */
-    equal: function (field, message) {
-        return this.constrain('equal', field, message);
+    equal: function (name, message) {
+        return this.constrain('equal', name, message);
     },
 
     /**
@@ -277,6 +277,7 @@ Validation.rule = function (rule, validator) {
     staticRules[rule] = validator;
 };
 
+staticRules.equal = require('./rules/equal');
 staticRules.max = require('./rules/max');
 staticRules.maxLength = require('./rules/max-length');
 staticRules.min = require('./rules/min');
