@@ -9,6 +9,7 @@
 'use strict';
 
 var validator = require('blear.utils.validator');
+var typeis = require('blear.utils.typeis');
 
 var englishAlias = require('../utils/english-alias');
 var isEmpty = require('../utils/is-empty');
@@ -28,6 +29,24 @@ module.exports = function (value) {
     var alias = context.alias;
 
     switch (context.limit) {
+        case 'string':
+            return typeis.String(value) ? '' : englishAlias(alias, 2) + '必须是字符串格式';
+
+        case 'number':
+            return typeis.Number(value) ? '' : englishAlias(alias, 2) + '必须是数值格式';
+
+        case 'boolean':
+            return typeis.Boolean(value) ? '' : englishAlias(alias, 2) + '必须是布尔格式';
+
+        case 'array':
+            return typeis.Array(value) ? '' : englishAlias(alias, 2) + '必须是数组格式';
+
+        case 'object':
+            return typeis.Object(value) ? '' : englishAlias(alias, 2) + '必须是对象格式';
+
+        case 'function':
+            return typeis.Function(value) ? '' : englishAlias(alias, 2) + '必须是函数格式';
+
         case 'mobile':
             return validator.isMobile(value) ? '' : '手机号码不合法';
 
@@ -38,10 +57,10 @@ module.exports = function (value) {
             return validator.isNumerical(value) ? '' : englishAlias(alias, 2) + '数值不合法';
 
         case 'digital':
-            return validator.isDigital(value) ? '' : englishAlias(alias, 2)  + '必须是数字';
+            return validator.isDigital(value) ? '' : englishAlias(alias, 2) + '必须是数字';
 
         case 'integer':
-            return validator.isInteger(value) ? '' : englishAlias(alias, 2)  + '必须是整数';
+            return validator.isInteger(value) ? '' : englishAlias(alias, 2) + '必须是整数';
 
         case 'url':
         case 'http':

@@ -12,7 +12,6 @@ var Events = require('blear.classes.events');
 var object = require('blear.utils.object');
 var plan = require('blear.utils.plan');
 var typeis = require('blear.utils.typeis');
-var fun = require('blear.utils.function');
 var access = require('blear.utils.access');
 
 var defaults = {
