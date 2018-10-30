@@ -61,13 +61,13 @@ var Validation = Events.extend({
 
     /**
      * 设置字段是否有效
-     * @param useful
+     * @param enabling
      * @returns {Validation}
      */
-    useful: function (useful) {
+    enable: function (enabling) {
         var the = this;
-        the[_currentField].useful = typeis.Function(useful) ? useful : function () {
-            return Boolean(useful);
+        the[_currentField].enabling = typeis.Function(enabling) ? enabling : function () {
+            return Boolean(enabling);
         };
         return the;
     },
@@ -209,10 +209,24 @@ var Validation = Events.extend({
         plan
             .each(the[_fields], function (index, field, next) {
                 var build = the[_buildContext](field, data);
+                var context = build();
+                var enabling = true;
+
                 plan
+                    .task(function (next) {
+                        the[_execEnable](context, field.enabling, function (bool) {
+                            enabling = Boolean(bool);
+                            next();
+                        });
+                    })
                     .each(field.constraints, function (index, constraint, next) {
+                        // 不可用
+                        if (!enabling) {
+                            return next();
+                        }
+
                         var context = build(constraint);
-                        the[_execValidate](context, constraint, function (err) {
+                        the[_execValidate](context, constraint.validator, function (err) {
                             if (!err) {
                                 return next();
                             }
@@ -246,6 +260,7 @@ var _aliases = sole();
 var _buildField = sole();
 var _buildConstraint = sole();
 var _buildContext = sole();
+var _execEnable = sole();
 var _execValidate = sole();
 var proto = Validation.prototype;
 
@@ -276,7 +291,7 @@ module.exports = Validation;
  * 构建字段
  * @param name
  * @param alias
- * @returns {{name: *, alias: *, useful: (function(): boolean), constraints: Array}}
+ * @returns {{name: *, alias: *, enabling: (function(): boolean), constraints: Array}}
  */
 proto[_buildField] = function (name, alias) {
     var the = this;
@@ -284,7 +299,7 @@ proto[_buildField] = function (name, alias) {
     return {
         name: name,
         alias: the[_aliases][name] = alias || name,
-        useful: function () {
+        enabling: function () {
             return true;
         },
         constraints: []
@@ -322,15 +337,29 @@ proto[_buildConstraint] = function (rule, limit, message) {
 };
 
 /**
- * 执行验证
+ * 执行可用判断
  * @param context
- * @param constraint
+ * @param enabling
  * @param callback
  */
-proto[_execValidate] = function (context, constraint, callback) {
+proto[_execEnable] = function (context, enabling, callback) {
+    if (enabling.length >= 2) {
+        enabling.call(context, context.value, callback);
+    } else {
+        callback(enabling.call(context, context.value));
+    }
+};
+
+/**
+ * 执行验证
+ * @param context
+ * @param validator
+ * @param callback
+ */
+proto[_execValidate] = function (context, validator, callback) {
     var errWith = function (err) {
         context.message = err.message;
-        err.validation = context;
+        err.context = context;
         return err;
     };
     var next = function (message) {
@@ -354,7 +383,6 @@ proto[_execValidate] = function (context, constraint, callback) {
 
         callback();
     };
-    var validator = constraint.validator;
 
     if (validator.length >= 2) {
         validator.call(context, context.value, next);
@@ -375,6 +403,7 @@ proto[_buildContext] = function (field, data) {
     var the = this;
     var name = field.name;
     var context = {
+        options: the[_options],
         name: name,
         aliases: the[_aliases],
         alias: field.alias,
@@ -384,15 +413,17 @@ proto[_buildContext] = function (field, data) {
 
     /**
      * 构建上下文
-     * @param constraint
+     * @param [constraint]
      * @param constraint.limit
      * @param constraint.message
      * @param constraint.rule
      */
     return function (constraint) {
-        context.limit = constraint.limit;
-        context.message = constraint.message;
-        context.rule = constraint.rule;
+        if (constraint) {
+            context.limit = constraint.limit;
+            context.message = constraint.message;
+            context.rule = constraint.rule;
+        }
         return context;
     }
 };
