@@ -20,6 +20,7 @@ describe('pattern', function () {
         va.field('a').pattern(/^[a-z]+$/);
         va.field('b').pattern(/^[a-z]+$/, '必须是小写英文字母');
         va.field('c').pattern(/^[a-z]+$/);
+        va.field('d').pattern(/^[a-z]+$/);
 
         va.validate({
             a: 'a1',

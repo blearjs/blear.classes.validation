@@ -20,6 +20,7 @@ describe('equal', function () {
         va.field('a');
         va.field('b').equal('a');
         va.field('c').equal('a', 'c=a');
+        va.field('d').equal('a');
 
         va.validate({
             a: '1',
