@@ -31,11 +31,8 @@ describe('trim', function () {
             b: ' 123 '
         }, function (errs) {
             expect(errs.length).toBe(2);
-
             expect(errs[0].message).toBe('a不合法');
-
             expect(errs[1].message).toBe('b两端有空白');
-
             done();
         });
     });

@@ -38,7 +38,7 @@ module.exports = function (value) {
             return validator.isDigital(value) ? '' : context.alias + '必须是数字';
 
         case 'integer':
-            return validator.isInteger(value) ? '' : context.alias + '必须为整数';
+            return validator.isInteger(value) ? '' : context.alias + '必须是整数';
 
         case 'url':
         case 'http':
