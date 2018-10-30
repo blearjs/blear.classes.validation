@@ -34,6 +34,7 @@ var Validation = Events.extend({
     constructor: function (options) {
         var the = this;
 
+        Validation.parent(the);
         the[_options] = object.assign({}, defaults, options);
         the[_fields] = [];
         the[_aliases] = {};
@@ -211,6 +212,7 @@ var Validation = Events.extend({
                 var context = build();
                 var enabling = true;
 
+                the.emit('field', context);
                 plan
                     .task(function (next) {
                         the[_execEnable](context, field.enabling, function (bool) {
@@ -225,12 +227,16 @@ var Validation = Events.extend({
                         }
 
                         var context = build(constraint);
+
+                        the.emit('validate', context);
                         the[_execValidate](context, constraint.validator, function (err) {
                             if (!err) {
+                                the.emit('valid', context);
                                 return next();
                             }
 
                             errs.push(err);
+                            the.emit('invalid', context);
 
                             if (skipInvalid) {
                                 return next();
@@ -243,10 +249,13 @@ var Validation = Events.extend({
             })
             .serial(function (err) {
                 if (skipInvalid) {
-                    return callback(errs, data);
+                    callback(errs, data);
+                    the.emit(errs.length ? 'error' : 'success');
+                    return;
                 }
 
                 callback(errs[0], data);
+                the.emit(errs[0] ? 'error' : 'success');
             });
     }
 });
