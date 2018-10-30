@@ -9,7 +9,7 @@
 
 var Validation = require('../src/index.js');
 
-describe('测试文件', function () {
+describe('blear.classes.validation', function () {
 
     it('basic', function (done) {
         var va = new Validation();
@@ -34,7 +34,7 @@ describe('测试文件', function () {
         });
     });
 
-    it('#enable', function (done) {
+    it('#enable(value)', function (done) {
         var va = new Validation();
 
         va.field('username', '用户名')
@@ -47,6 +47,33 @@ describe('测试文件', function () {
                 expect(this.value).toBe('123');
                 expect(value).toBe('123');
                 return false;
+            });
+
+        var data = {
+            username: '123'
+        };
+        va.validate(data, function (err) {
+            expect(err).toBeFalsy();
+            done();
+        });
+    });
+
+    it('#enable(value, next)', function (done) {
+        var va = new Validation();
+
+        va.field('username', '用户名')
+            .constrain('required', true)
+            .enable(function (value, next) {
+                expect(this.options.skipInvalid).toBe(false);
+                expect(this.data).toBe(data);
+                expect(this.alias).toBe('用户名');
+                expect(this.name).toBe('username');
+                expect(this.value).toBe('123');
+                expect(value).toBe('123');
+
+                setTimeout(function () {
+                    next(false);
+                }, 10);
             });
 
         var data = {
