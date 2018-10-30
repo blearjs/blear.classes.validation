@@ -36,14 +36,19 @@ describe('#rule', function () {
 
     it('实例 rule', function (done) {
         var rule1 = 'r1' + Date.now();
+        var rule3 = 'r2' + Date.now();
         var validator1 = function (value) {
             return '就是不符合1';
         };
         var validator2 = function (value) {
             return '就是不符合2';
         };
+        var validator3 = function (value) {
+            return '就是不符合3';
+        };
 
         Validation.rule(rule1, validator1);
+        Validation.rule(rule3, validator3);
         expect(Validation.rule(rule1)).toBe(validator1);
 
         var va = new Validation({
@@ -52,6 +57,9 @@ describe('#rule', function () {
 
         // 覆盖静态
         va.rule(rule1, validator2);
+
+        expect(va.rule(rule1)).toBe(validator2);
+        expect(va.rule(rule3)).toBe(validator3);
 
         va.field('a').constrain(rule1, true);
         va.field('b').constrain(rule1, true, '不符合吗');

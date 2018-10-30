@@ -183,7 +183,7 @@ var Validation = Events.extend({
 
     /**
      * 字段类型
-     * @param pattern {regexp} 正则表达式
+     * @param pattern {RegExp} 正则表达式
      * @param [message] {string} 消息
      * @returns {Validation}
      */
@@ -281,6 +281,7 @@ staticRules.max = require('./rules/max');
 staticRules.maxLength = require('./rules/max-length');
 staticRules.min = require('./rules/min');
 staticRules.minLength = require('./rules/min-length');
+staticRules.pattern = require('./rules/pattern');
 staticRules.required = require('./rules/required');
 staticRules.trim = require('./rules/trim');
 staticRules.type = require('./rules/type');
