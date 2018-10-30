@@ -358,7 +358,8 @@ proto[_execEnable] = function (context, enabling, callback) {
  */
 proto[_execValidate] = function (context, validator, callback) {
     var errWith = function (err) {
-        context.message = err.message = context.message || err.message;
+        context.message = err.message = context.message || err.message
+            || context.alias + '不合法';
         err.context = context;
         return err;
     };

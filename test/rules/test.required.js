@@ -12,7 +12,7 @@ var Validation = require('../../src/index.js');
 
 describe('required', function () {
 
-    it('basic', function () {
+    it('basic', function (done) {
         var va = new Validation({
             skipInvalid: true
         });
@@ -35,6 +35,8 @@ describe('required', function () {
             expect(errs[1].context.name).toBe('b');
             expect(errs[1].context.alias).toBe('B段');
             expect(errs[1].context.message).toBe('<<B 段一定不能为空>>');
+
+            done();
         });
     });
 
