@@ -107,6 +107,44 @@ describe('type', function () {
         });
     });
 
+    it('url/http', function (done) {
+        var va = new Validation({
+            skipInvalid: true
+        });
+
+        va.field('a').type('url');
+        va.field('b').type('http', '不像一个网络地址');
+
+        va.validate({
+            a: '123a',
+            b: '-1000b'
+        }, function (errs) {
+            expect(errs.length).toBe(2);
+            expect(errs[0].message).toBe('网络地址不合法');
+            expect(errs[1].message).toBe('不像一个网络地址');
+            done();
+        });
+    });
+
+    it('idNo', function (done) {
+        var va = new Validation({
+            skipInvalid: true
+        });
+
+        va.field('a').type('idNo');
+        va.field('b').type('idNo', '不像一个身份证号码');
+
+        va.validate({
+            a: '123a',
+            b: '-1000b'
+        }, function (errs) {
+            expect(errs.length).toBe(2);
+            expect(errs[0].message).toBe('身份证号码不合法');
+            expect(errs[1].message).toBe('不像一个身份证号码');
+            done();
+        });
+    });
+
 });
 
 
