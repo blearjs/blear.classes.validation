@@ -12,6 +12,38 @@ var Validation = require('../../src/index.js');
 
 describe('type', function () {
 
+    it('数据格式', function (done) {
+        var va =  new Validation({
+            skipInvalid: true
+        });
+
+        va.field('a').type('string');
+        va.field('b').type('number');
+        va.field('c').type('boolean');
+        va.field('d').type('array');
+        va.field('e').type('object');
+        va.field('f').type('function');
+
+        va.validate({
+            a: 1,
+            b: '2',
+            c: 3,
+            d: 4,
+            e: 5,
+            f: 6
+        }, function (errs) {
+            expect(errs.length).toBe(6);
+            expect(errs[0].message).toEqual('a 必须是字符串格式');
+            expect(errs[1].message).toEqual('b 必须是数值格式');
+            expect(errs[2].message).toEqual('c 必须是布尔值格式');
+            expect(errs[3].message).toEqual('d 必须是数组格式');
+            expect(errs[4].message).toEqual('e 必须是对象格式');
+            expect(errs[5].message).toEqual('f 必须是函数格式');
+
+            done();
+        });
+    });
+
     it('mobile', function (done) {
         var va = new Validation({
             skipInvalid: true

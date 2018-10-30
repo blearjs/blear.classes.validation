@@ -36,7 +36,7 @@ module.exports = function (value) {
             return typeis.Number(value) ? '' : englishAlias(alias, 2) + '必须是数值格式';
 
         case 'boolean':
-            return typeis.Boolean(value) ? '' : englishAlias(alias, 2) + '必须是布尔格式';
+            return typeis.Boolean(value) ? '' : englishAlias(alias, 2) + '必须是布尔值格式';
 
         case 'array':
             return typeis.Array(value) ? '' : englishAlias(alias, 2) + '必须是数组格式';
