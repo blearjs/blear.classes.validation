@@ -12,15 +12,19 @@ var englishAlias = require('../utils/english-alias');
 var isEmpty = require('../utils/is-empty');
 
 /**
- * 必填
+ * max
  * @param value
- * @returns {string}
+ * @returns {string | undefined}
  */
 module.exports = function (value) {
     var context = this;
 
-    if (context.limit && isEmpty(value)) {
-        return englishAlias(context.alias, 2) + '不能为空';
+    if (isEmpty(value)) {
+        return;
+    }
+
+    if (value > context.limit) {
+        return englishAlias(context.alias, 2) + '不能大于 ' + context.limit;
     }
 };
 

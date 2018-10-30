@@ -30,7 +30,7 @@ describe('required', function () {
 
             expect(errs[0].context.name).toBe('a');
             expect(errs[0].context.alias).toBe('a');
-            expect(errs[0].context.message).toBe('a不能为空');
+            expect(errs[0].context.message).toBe('a 不能为空');
 
             expect(errs[1].context.name).toBe('b');
             expect(errs[1].context.alias).toBe('B段');

@@ -10,19 +10,22 @@
 
 var validator = require('blear.utils.validator');
 
+var englishAlias = require('../utils/english-alias');
 var isEmpty = require('../utils/is-empty');
 
 /**
  * 必填
  * @param value
- * @returns {string}
+ * @returns {string | undefined}
  */
 module.exports = function (value) {
     var context = this;
 
     if (isEmpty(value)) {
-        return '';
+        return;
     }
+
+    var alias = context.alias;
 
     switch (context.limit) {
         case 'mobile':
@@ -32,13 +35,13 @@ module.exports = function (value) {
             return validator.isEmail(value) ? '' : '邮箱地址不合法';
 
         case 'numerical':
-            return validator.isNumerical(value) ? '' : context.alias + '数值不合法';
+            return validator.isNumerical(value) ? '' : englishAlias(alias, 2) + '数值不合法';
 
         case 'digital':
-            return validator.isDigital(value) ? '' : context.alias + '必须是数字';
+            return validator.isDigital(value) ? '' : englishAlias(alias, 2)  + '必须是数字';
 
         case 'integer':
-            return validator.isInteger(value) ? '' : context.alias + '必须是整数';
+            return validator.isInteger(value) ? '' : englishAlias(alias, 2)  + '必须是整数';
 
         case 'url':
         case 'http':

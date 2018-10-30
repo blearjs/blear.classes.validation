@@ -63,7 +63,7 @@ describe('type', function () {
             b: '123a'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a数值不合法');
+            expect(errs[0].message).toBe('a 数值不合法');
             expect(errs[1].message).toBe('不像一个数值');
             done();
         });
@@ -82,7 +82,7 @@ describe('type', function () {
             b: '123a'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a必须是数字');
+            expect(errs[0].message).toBe('a 必须是数字');
             expect(errs[1].message).toBe('不像一个数字');
             done();
         });
@@ -101,7 +101,7 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a必须是整数');
+            expect(errs[0].message).toBe('a 必须是整数');
             expect(errs[1].message).toBe('不像一个整数');
             done();
         });

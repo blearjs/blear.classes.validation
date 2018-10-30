@@ -277,9 +277,13 @@ Validation.rule = function (rule, validator) {
     staticRules[rule] = validator;
 };
 
+staticRules.max = require('./rules/max');
+staticRules.maxLength = require('./rules/max-length');
+staticRules.min = require('./rules/min');
+staticRules.minLength = require('./rules/min-length');
+staticRules.required = require('./rules/required');
 staticRules.trim = require('./rules/trim');
 staticRules.type = require('./rules/type');
-staticRules.required = require('./rules/required');
 
 module.exports = Validation;
 
