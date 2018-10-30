@@ -20,11 +20,13 @@ describe('max', function () {
         va.field('a').type('numerical').max(100);
         va.field('b').type('numerical').max(100, '100最大了');
         va.field('c').type('numerical').max(100);
+        va.field('d').type('numerical').max(100);
 
         va.validate({
             a: 1230,
             b: 1230,
-            c: 99
+            c: 99,
+            d: ''
         }, function (errs) {
             expect(errs.length).toBe(2);
             expect(errs[0].message).toBe('a 不能大于 100');

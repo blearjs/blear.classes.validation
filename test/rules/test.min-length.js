@@ -20,11 +20,13 @@ describe('min-length', function () {
         va.field('a').minLength(3);
         va.field('b').minLength(3, '最少三位');
         va.field('c').minLength(3);
+        va.field('d').minLength(3);
 
         va.validate({
             a: '1',
             b: '1',
-            c: '123'
+            c: '123',
+            d: ''
         }, function (errs) {
             expect(errs.length).toBe(2);
             expect(errs[0].message).toBe('a 不能少于 3 个长度');

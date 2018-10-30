@@ -20,11 +20,13 @@ describe('max-length', function () {
         va.field('a').maxLength(3);
         va.field('b').maxLength(3, '最多三位');
         va.field('c').maxLength(3);
+        va.field('d').maxLength(3);
 
         va.validate({
             a: '123123',
             b: '123123',
-            c: '123'
+            c: '123',
+            d: ''
         }, function (errs) {
             expect(errs.length).toBe(2);
             expect(errs[0].message).toBe('a 不能超过 3 个长度');
