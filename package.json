@@ -1,7 +1,7 @@
 {
   "name": "blear.classes.validation",
-  "version": "2.0.2",
-  "description": "通用的数据验证",
+  "version": "2.0.3",
+  "description": "顺序的、同异步的数据的表单过滤及验证",
   "scripts": {
     "live": "browser-sync start --config bs-config.js",
     "test": "node ./node_modules/.bin/karma start karma.conf.js --single-run",

@@ -1,5 +1,5 @@
 # blear.classes.validation
-顺序、异步的数据逻辑的表单验证。
+顺序的、同异步的数据的表单过滤及验证
 
 <https://blear.ydr.me/classes/validation>
 
