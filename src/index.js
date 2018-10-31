@@ -21,7 +21,14 @@ var defaults = {
      * false：出错就不再继续验证（最多只可能一个错误结果）
      * @type Boolean
      */
-    skipInvalid: false
+    skipInvalid: false,
+
+    /**
+     * 表单验证的数据是否可以被验证规则覆盖，比如 trim 操作
+     * 默认 true
+     * @type boolean
+     */
+    override: true
 };
 var staticRules = {};
 var Validation = Events.extend({
@@ -92,7 +99,7 @@ var Validation = Events.extend({
     /**
      * 限制
      * @param rule {string|function} 限制（静态、实例）规则，或函数
-     * @param limit {*} 规则限制条件
+     * @param [limit] {*} 规则限制条件
      * @param [message] {string} 超过规则限制的消息
      * @returns {Validation}
      */
@@ -200,6 +207,7 @@ var Validation = Events.extend({
         var the = this;
         var errs = [];
         var skipInvalid = the[_options].skipInvalid;
+        var override = the[_options].override;
 
         if (the[_currentField]) {
             the[_fields].push(the[_currentField]);
@@ -208,8 +216,8 @@ var Validation = Events.extend({
 
         plan
             .each(the[_fields], function (index, field, next) {
-                var build = the[_buildContext](field, data);
-                var context = build();
+                var extend = the[_buildContext](field, data);
+                var context = extend();
                 var enabling = true;
 
                 the.emit('field', context);
@@ -226,12 +234,17 @@ var Validation = Events.extend({
                             return next();
                         }
 
-                        var context = build(constraint);
+                        var context = extend(constraint);
 
                         the.emit('validate', context);
                         the[_execValidate](context, constraint.validator, function (err) {
                             if (!err) {
                                 the.emit('valid', context);
+
+                                if (override) {
+                                    data[field.name] = context.value;
+                                }
+
                                 return next();
                             }
 

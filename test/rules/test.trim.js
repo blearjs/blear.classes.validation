@@ -37,6 +37,50 @@ describe('trim', function () {
         });
     });
 
+    it('override = true', function (done) {
+        var va = new Validation({
+            override: true
+        });
+        var data = {
+            a: '  123  ',
+            b: '  456\n\n\n\t\t'
+        };
+
+        va.field('a').trim();
+        va.field('b').trim();
+
+        va.validate(data, function (err, data2) {
+            expect(err).toBeFalsy();
+            expect(data.a).toEqual('123');
+            expect(data.b).toEqual('456');
+            expect(data2).toBe(data);
+            done();
+        });
+    });
+
+    it('override = false', function (done) {
+        var va = new Validation({
+            override: false
+        });
+        var a = '  123  ';
+        var b = '  456\n\n\n\t\t';
+        var data = {
+            a: a,
+            b: b
+        };
+
+        va.field('a').trim();
+        va.field('b').trim();
+
+        va.validate(data, function (err, data2) {
+            expect(err).toBeFalsy();
+            expect(data.a).toEqual(a);
+            expect(data.b).toEqual(b);
+            expect(data2).toBe(data);
+            done();
+        });
+    });
+
 });
 
 
