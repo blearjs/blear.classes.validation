@@ -48,10 +48,10 @@ module.exports = function (value) {
             return typeis.Function(value) ? '' : englishAlias(alias, 2) + '必须是函数格式';
 
         case 'mobile':
-            return validator.isMobile(value) ? '' : '手机号码不合法';
+            return validator.isMobile(value) ? '' : englishAlias(alias, 2) + '不合法';
 
         case 'email':
-            return validator.isEmail(value) ? '' : '邮箱地址不合法';
+            return validator.isEmail(value) ? '' : englishAlias(alias, 2) + '不合法';
 
         case 'numerical':
             return validator.isNumerical(value) ? '' : englishAlias(alias, 2) + '数值不合法';
@@ -64,10 +64,10 @@ module.exports = function (value) {
 
         case 'url':
         case 'http':
-            return validator.isHTTP(value) ? null : '网络地址不合法';
+            return validator.isHTTP(value) ? null : englishAlias(alias, 2) + '不合法';
 
         case 'idNo':
-            return validator.isIdNo(value) ? null : '身份证号码不合法';
+            return validator.isIdNo(value) ? null : englishAlias(alias, 2) + '不合法';
     }
 };
 
