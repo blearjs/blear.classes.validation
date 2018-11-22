@@ -57,7 +57,7 @@ describe('type', function () {
             b: ' 123 '
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('手机号码不合法');
+            expect(errs[0].message).toBe('a 不合法');
             expect(errs[1].message).toBe('手机号一定要是一个手机号');
             done();
         });
@@ -76,7 +76,7 @@ describe('type', function () {
             b: ' 123 '
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('邮箱地址不合法');
+            expect(errs[0].message).toBe('a 不合法');
             expect(errs[1].message).toBe('邮箱一定要像个邮箱');
             done();
         });
@@ -152,7 +152,7 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('网络地址不合法');
+            expect(errs[0].message).toBe('a 不合法');
             expect(errs[1].message).toBe('不像一个网络地址');
             done();
         });
@@ -171,7 +171,7 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('身份证号码不合法');
+            expect(errs[0].message).toBe('a 不合法');
             expect(errs[1].message).toBe('不像一个身份证号码');
             done();
         });
