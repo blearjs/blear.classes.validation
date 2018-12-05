@@ -21,12 +21,16 @@ describe('#child', function () {
         var va3 = new Validation({
             skipInvalid: true
         });
+        var va4 = new Validation();
         var data = {
             a: {
                 b: '1',
                 c: 2,
                 d: {
-                    e: '3'
+                    e: '3',
+                    f: {
+                        g: '4'
+                    }
                 }
             }
         };
@@ -36,6 +40,8 @@ describe('#child', function () {
         va2.field('c').type('number');
         va2.field('d').type('object').child(va3);
         va3.field('e').type('number');
+        va3.field('f').type('object').child(va4);
+        va4.field('g').type('string');
 
         va1.validate(data, function (errs) {
             expect(errs.length).toBe(2);

@@ -195,6 +195,74 @@ describe('type', function () {
         });
     });
 
+    it('type valid', function (done) {
+        // var plan = require('blear.utils.plan');
+        // var exec = function (num) {
+        //     return new Promise(function (resolve) {
+        //         var wait = Math.random() * 500 + 10;
+        //         setTimeout(function () {
+        //             console.log('%d: %dms', num, wait);
+        //             resolve();
+        //         }, wait);
+        //     });
+        // };
+        //
+        // plan
+        //     .taskSync(function () {
+        //         console.time('耗时');
+        //     })
+        //     .eachPromise(new Array(10), function (index) {
+        //         return exec(index);
+        //     })
+        //     .serial(function () {
+        //         console.timeEnd('耗时');
+        //     });
+
+
+        var va = new Validation();
+        var data = {
+            a: 'string',
+            b: 123,
+            c: true,
+            d: [1],
+            e: {
+                E: 'E'
+            },
+            f: function () {
+                // ...
+            },
+            g: '18812341234',
+            h: 'a@b.cc',
+            i: '123',
+            j: '0012',
+            k: '123',
+            l: 'http://123.com',
+            m: 'https://456.cc',
+            n: '110101201508049664',
+            o: 'xxxxx'
+        };
+        va.field('a').type('string');
+        va.field('b').type('number');
+        va.field('c').type('boolean');
+        va.field('d').type('array');
+        va.field('e').type('object');
+        va.field('f').type('function');
+        va.field('g').type('mobile');
+        va.field('h').type('email');
+        va.field('i').type('numerical');
+        va.field('j').type('digital');
+        va.field('k').type('integer');
+        va.field('l').type('url');
+        va.field('m').type('http');
+        va.field('n').type('idNo');
+        va.field('o').type('unknow');
+        va.validate(data, function (err) {
+            expect(err).toEqual(undefined);
+            done();
+        });
+    });
+
+
 });
 
 
