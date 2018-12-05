@@ -13,7 +13,7 @@ var Validation = require('../../src/index.js');
 describe('type', function () {
 
     it('数据格式', function (done) {
-        var va =  new Validation({
+        var va = new Validation({
             skipInvalid: true
         });
 
@@ -57,7 +57,7 @@ describe('type', function () {
             b: ' 123 '
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 不合法');
+            expect(errs[0].message).toBe('a 必须是手机号格式');
             expect(errs[1].message).toBe('手机号一定要是一个手机号');
             done();
         });
@@ -76,7 +76,7 @@ describe('type', function () {
             b: ' 123 '
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 不合法');
+            expect(errs[0].message).toBe('a 必须是邮箱格式');
             expect(errs[1].message).toBe('邮箱一定要像个邮箱');
             done();
         });
@@ -95,7 +95,7 @@ describe('type', function () {
             b: '123a'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 数值不合法');
+            expect(errs[0].message).toBe('a 必须是有效数值格式');
             expect(errs[1].message).toBe('不像一个数值');
             done();
         });
@@ -114,7 +114,7 @@ describe('type', function () {
             b: '123a'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 必须是数字');
+            expect(errs[0].message).toBe('a 必须是数字格式');
             expect(errs[1].message).toBe('不像一个数字');
             done();
         });
@@ -133,7 +133,7 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 必须是整数');
+            expect(errs[0].message).toBe('a 必须是整数格式');
             expect(errs[1].message).toBe('不像一个整数');
             done();
         });
@@ -152,7 +152,7 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 不合法');
+            expect(errs[0].message).toBe('a 必须是网络地址格式');
             expect(errs[1].message).toBe('不像一个网络地址');
             done();
         });
@@ -171,8 +171,26 @@ describe('type', function () {
             b: '-1000b'
         }, function (errs) {
             expect(errs.length).toBe(2);
-            expect(errs[0].message).toBe('a 不合法');
+            expect(errs[0].message).toBe('a 必须是身份证格式');
             expect(errs[1].message).toBe('不像一个身份证号码');
+            done();
+        });
+    });
+
+    it('type limit is an array', function (done) {
+        var va = new Validation({
+            skipInvalid: true
+        });
+
+        va.field('a').type(['boolean', 'number']);
+        va.field('b').type(['boolean', 'number']);
+
+        va.validate({
+            a: '123',
+            b: 123
+        }, function (errs) {
+            expect(errs.length).toBe(1);
+            expect(errs[0].message).toBe('a 必须是布尔值或数值格式');
             done();
         });
     });

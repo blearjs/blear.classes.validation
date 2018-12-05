@@ -121,7 +121,7 @@ var Validation = Events.extend({
 
     /**
      * 字段类型
-     * @param type {string} 类型
+     * @param type {string | Array} 单个或多个类型
      * @param [message] {string} 消息
      * @returns {Validation}
      */
