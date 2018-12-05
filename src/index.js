@@ -13,6 +13,7 @@ var object = require('blear.utils.object');
 var plan = require('blear.utils.plan');
 var typeis = require('blear.utils.typeis');
 var access = require('blear.utils.access');
+var array = require('blear.utils.array');
 
 var defaults = {
     /**
@@ -50,9 +51,8 @@ var Validation = Events.extend({
 
     /**
      * 定义验证字段
-     * @todo 嵌套验证
-     * @param name
-     * @param alias
+     * @param name {String} 字段
+     * @param [alias] {String} 别名
      * @returns {Validation}
      */
     field: function (name, alias) {
@@ -199,77 +199,91 @@ var Validation = Events.extend({
     },
 
     /**
+     * 子验证规则
+     * @param validation
+     * @returns {Validation}
+     */
+    child: function (validation) {
+        var the = this;
+        the[_currentField].child = validation;
+        return the;
+    },
+
+    /**
      * 表单验证
      * @param data
      * @param callback
      */
     validate: function (data, callback) {
         var the = this;
-        var errs = [];
+        var errors = [];
         var skipInvalid = the[_options].skipInvalid;
-        var override = the[_options].override;
+        var p = plan;
 
         if (the[_currentField]) {
             the[_fields].push(the[_currentField]);
             the[_currentField] = null;
         }
 
-        plan
-            .each(the[_fields], function (index, field, next) {
-                var extend = the[_buildContext](field, data);
-                var context = extend();
-                var enabling = true;
+        array.each(the[_fields], function (index, field) {
+            p = p.task(function (next) {
+                the[_validateField](data, field, function (err) {
+                    if (err) {
+                        errors.push(err);
 
-                the.emit('field', context);
-                plan
-                    .task(function (next) {
-                        the[_execEnable](context, field.enabling, function (bool) {
-                            enabling = Boolean(bool);
+                        if (skipInvalid) {
                             next();
-                        });
-                    })
-                    .each(field.constraints, function (index, constraint, next) {
-                        // 不可用
-                        if (!enabling) {
+                            return;
+                        }
+                    }
+
+                    next(err);
+                });
+            });
+
+            if (field.child) {
+                p = p.task(function (next) {
+                    field.child.validate(data[field.name], function (errs) {
+                        errs = typeis.Array(errs)
+                            ? errs
+                            : (errs ? [errs] : []);
+                        errors.push.apply(errors, errs);
+
+                        if (errs.length && skipInvalid) {
                             return next();
                         }
 
-                        var context = extend(constraint);
+                        next(errs[0]);
+                    });
+                });
+            }
+        });
 
-                        the.emit('validate', context);
-                        the[_execValidate](context, constraint.validator, function (err) {
-                            if (!err) {
-                                the.emit('valid', context);
+        p.serial(function () {
+            if (skipInvalid) {
+                callback(errors, data);
+                the.emit(errors.length ? 'error' : 'success');
+                return;
+            }
 
-                                if (override) {
-                                    data[field.name] = context.value;
-                                }
+            callback(errors[0], data);
+            the.emit(errors[0] ? 'error' : 'success');
+        });
 
-                                return next();
-                            }
-
-                            errs.push(err);
-                            the.emit('invalid', context);
-
-                            if (skipInvalid) {
-                                return next();
-                            }
-
-                            next(1);
-                        });
-                    })
-                    .serial(next);
-            })
-            .serial(function (err) {
-                if (skipInvalid) {
-                    callback(errs, data);
-                    the.emit(errs.length ? 'error' : 'success');
-                    return;
-                }
-
-                callback(errs[0], data);
-                the.emit(errs[0] ? 'error' : 'success');
-            });
+        // plan
+        //     .each(the[_fields], function (index, field, next) {
+        //         the[_validateField](data, field, errors, next);
+        //     })
+        //     .serial(function (err) {
+        //         if (skipInvalid) {
+        //             callback(errors, data);
+        //             the.emit(errors.length ? 'error' : 'success');
+        //             return;
+        //         }
+        //
+        //         callback(errors[0], data);
+        //         the.emit(errors[0] ? 'error' : 'success');
+        //     });
     }
 });
 var sole = Validation.sole;
@@ -283,6 +297,7 @@ var _buildConstraint = sole();
 var _buildContext = sole();
 var _execEnable = sole();
 var _execValidate = sole();
+var _validateField = sole();
 var proto = Validation.prototype;
 
 /**
@@ -324,12 +339,18 @@ proto[_buildField] = function (name, alias) {
     var the = this;
 
     return {
+        // 字段
         name: name,
+        // 别名
         alias: the[_aliases][name] = alias || name,
+        // 是否有效
         enabling: function () {
             return true;
         },
-        constraints: []
+        // 验证规则
+        constraints: [],
+        // 子验证
+        child: null
     };
 };
 
@@ -455,3 +476,51 @@ proto[_buildContext] = function (field, data) {
         return context;
     }
 };
+
+/**
+ * 单个字段验证
+ * @param data
+ * @param field
+ * @param callback
+ */
+proto[_validateField] = function (data, field, callback) {
+    var the = this;
+    var override = the[_options].override;
+    var extend = the[_buildContext](field, data);
+    var context = extend();
+    var enabling = true;
+
+    the.emit('field', context);
+    plan
+        .task(function (next) {
+            the[_execEnable](context, field.enabling, function (bool) {
+                enabling = Boolean(bool);
+                next();
+            });
+        })
+        .each(field.constraints, function (index, constraint, next) {
+            // 不可用
+            if (!enabling) {
+                return next();
+            }
+
+            var context = extend(constraint);
+
+            the.emit('validate', context);
+            the[_execValidate](context, constraint.validator, function (err) {
+                if (err) {
+                    the.emit('invalid', context);
+                    return next(err);
+                }
+
+                if (override) {
+                    data[field.name] = context.value;
+                }
+
+                the.emit('valid', context);
+                next();
+            });
+        })
+        .serial(callback);
+};
+
