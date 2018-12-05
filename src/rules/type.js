@@ -43,6 +43,7 @@ module.exports = function (value) {
         digital: '数字',
         integer: '整数',
         url: '网络地址',
+        http: '网络地址',
         idNo: '身份证'
     };
 
@@ -116,6 +117,7 @@ module.exports = function (value) {
                 break;
 
             case 'url':
+            case 'http':
                 if (validator.isHTTP(value)) {
                     matched = true;
                 }
