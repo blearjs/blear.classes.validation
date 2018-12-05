@@ -269,21 +269,6 @@ var Validation = Events.extend({
             callback(errors[0], data);
             the.emit(errors[0] ? 'error' : 'success');
         });
-
-        // plan
-        //     .each(the[_fields], function (index, field, next) {
-        //         the[_validateField](data, field, errors, next);
-        //     })
-        //     .serial(function (err) {
-        //         if (skipInvalid) {
-        //             callback(errors, data);
-        //             the.emit(errors.length ? 'error' : 'success');
-        //             return;
-        //         }
-        //
-        //         callback(errors[0], data);
-        //         the.emit(errors[0] ? 'error' : 'success');
-        //     });
     }
 });
 var sole = Validation.sole;
