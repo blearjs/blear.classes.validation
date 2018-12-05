@@ -31,20 +31,20 @@ module.exports = function (value) {
     var limit = context.limit;
     var limits = typeis.Array(limit) ? limit : [limit];
     var limitMap = {
-        string: '字符串',
-        number: '数值',
-        boolean: '布尔值',
-        array: '数组',
-        object: '对象',
-        'function': '函数',
-        mobile: '手机号',
-        email: '邮箱',
-        numerical: '有效数值',
-        digital: '数字',
-        integer: '整数',
-        url: '网络地址',
-        http: '网络地址',
-        idNo: '身份证'
+        string: '字符串类型',
+        number: '数值类型',
+        boolean: '布尔值类型',
+        array: '数组类型',
+        object: '对象类型',
+        'function': '函数类型',
+        mobile: '手机号格式',
+        email: '邮箱格式',
+        numerical: '有效数值格式',
+        digital: '数字格式',
+        integer: '整数格式',
+        url: '网络地址格式',
+        http: '网络地址格式',
+        idNo: '身份证格式'
     };
 
     var matched = false;
@@ -145,7 +145,7 @@ module.exports = function (value) {
 
     return englishAlias(alias, 2) + '必须是' + array.map(limits, function (limit) {
         return limitMap[limit];
-    }).join('或') + '格式';
+    }).join('或');
 };
 
 

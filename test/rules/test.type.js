@@ -33,12 +33,12 @@ describe('type', function () {
             f: 6
         }, function (errs) {
             expect(errs.length).toBe(6);
-            expect(errs[0].message).toEqual('a 必须是字符串格式');
-            expect(errs[1].message).toEqual('b 必须是数值格式');
-            expect(errs[2].message).toEqual('c 必须是布尔值格式');
-            expect(errs[3].message).toEqual('d 必须是数组格式');
-            expect(errs[4].message).toEqual('e 必须是对象格式');
-            expect(errs[5].message).toEqual('f 必须是函数格式');
+            expect(errs[0].message).toEqual('a 必须是字符串类型');
+            expect(errs[1].message).toEqual('b 必须是数值类型');
+            expect(errs[2].message).toEqual('c 必须是布尔值类型');
+            expect(errs[3].message).toEqual('d 必须是数组类型');
+            expect(errs[4].message).toEqual('e 必须是对象类型');
+            expect(errs[5].message).toEqual('f 必须是函数类型');
 
             done();
         });
@@ -190,7 +190,7 @@ describe('type', function () {
             b: 123
         }, function (errs) {
             expect(errs.length).toBe(1);
-            expect(errs[0].message).toBe('a 必须是布尔值或数值格式');
+            expect(errs[0].message).toBe('a 必须是布尔值类型或数值类型');
             done();
         });
     });
