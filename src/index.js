@@ -121,12 +121,22 @@ var Validation = Events.extend({
 
     /**
      * 字段类型
-     * @param type {string | Array} 单个或多个类型
+     * @param type {string | Array} 单个或多个类型（string/number/boolean/array/object/function）
      * @param [message] {string} 消息
      * @returns {Validation}
      */
     type: function (type, message) {
         return this.constrain('type', type, message);
+    },
+
+    /**
+     * 字段格式
+     * @param type {string | Array} 单个或多个格式（mobile/email/numerical/digital/integer/url/http/idNo）
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    format: function (type, message) {
+        return this.constrain('format', type, message);
     },
 
     /**
@@ -299,6 +309,7 @@ Validation.rule = function (rule, validator) {
 };
 
 staticRules.equal = require('./rules/equal');
+staticRules.format = require('./rules/format');
 staticRules.max = require('./rules/max');
 staticRules.maxLength = require('./rules/max-length');
 staticRules.min = require('./rules/min');

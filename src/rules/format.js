@@ -31,49 +31,58 @@ module.exports = function (value) {
     var limit = context.limit;
     var limits = typeis.Array(limit) ? limit : [limit];
     var limitMap = {
-        string: '字符串类型',
-        number: '数值类型',
-        boolean: '布尔值类型',
-        array: '数组类型',
-        object: '对象类型',
-        'function': '函数类型'
+        mobile: '手机号格式',
+        email: '邮箱格式',
+        numerical: '有效数值格式',
+        digital: '数字格式',
+        integer: '整数格式',
+        url: '网络地址格式',
+        http: '网络地址格式',
+        idNo: '身份证格式'
     };
 
     var matched = false;
     array.each(limits, function (index, limit) {
         switch (limit) {
-            case 'string':
-                if (typeis.String(value)) {
+            case 'mobile':
+                if (validator.isMobile(value)) {
                     matched = true;
                 }
                 break;
 
-            case 'number':
-                if (typeis.Number(value)) {
+            case 'email':
+                if (validator.isEmail(value)) {
                     matched = true;
                 }
                 break;
 
-            case 'boolean':
-                if (typeis.Boolean(value)) {
+            case 'numerical':
+                if (validator.isNumerical(value)) {
                     matched = true;
                 }
                 break;
 
-            case 'array':
-                if (typeis.Array(value)) {
+            case 'digital':
+                if (validator.isDigital(value)) {
                     matched = true;
                 }
                 break;
 
-            case 'object':
-                if (typeis.Object(value)) {
+            case 'integer':
+                if (validator.isInteger(value)) {
                     matched = true;
                 }
                 break;
 
-            case 'function':
-                if (typeis.Function(value)) {
+            case 'url':
+            case 'http':
+                if (validator.isHTTP(value)) {
+                    matched = true;
+                }
+                break;
+
+            case 'idNo':
+                if (validator.isIdNo(value)) {
                     matched = true;
                 }
                 break;
