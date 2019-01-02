@@ -140,7 +140,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 必填
      * @param [message] {string} 消息
      * @returns {Validation}
      */
@@ -149,7 +149,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 最小长度
      * @param minLength {number} 最小长度
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -159,7 +159,17 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 指定长度
+     * @param length {number} 指定长度
+     * @param [message] {string} 消息
+     * @returns {Validation}
+     */
+    length: function (length, message) {
+        return this.constrain('length', length, message);
+    },
+
+    /**
+     * 最大长度
      * @param maxLength {number} 最大长度
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -169,7 +179,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 最小值
      * @param min {number} 最小值
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -179,7 +189,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 最大值
      * @param max {number} 最大值
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -189,7 +199,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 等于某个字段
      * @param name {string} 字段
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -199,7 +209,7 @@ var Validation = Events.extend({
     },
 
     /**
-     * 字段类型
+     * 规则验证
      * @param pattern {RegExp} 正则表达式
      * @param [message] {string} 消息
      * @returns {Validation}
@@ -310,6 +320,7 @@ Validation.rule = function (rule, validator) {
 
 staticRules.equal = require('./rules/equal');
 staticRules.format = require('./rules/format');
+staticRules.length = require('./rules/length');
 staticRules.max = require('./rules/max');
 staticRules.maxLength = require('./rules/max-length');
 staticRules.min = require('./rules/min');
