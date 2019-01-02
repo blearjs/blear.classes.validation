@@ -131,12 +131,12 @@ var Validation = Events.extend({
 
     /**
      * 字段格式
-     * @param type {string | Array} 单个或多个格式（mobile/email/numerical/digital/integer/url/http/idNo）
+     * @param format {string | Array} 单个或多个格式（mobile/email/numerical/digital/integer/url/http/idNo）
      * @param [message] {string} 消息
      * @returns {Validation}
      */
-    format: function (type, message) {
-        return this.constrain('format', type, message);
+    format: function (format, message) {
+        return this.constrain('format', format, message);
     },
 
     /**
