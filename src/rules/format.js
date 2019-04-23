@@ -16,7 +16,7 @@ var englishAlias = require('../utils/english-alias');
 var isEmpty = require('../utils/is-empty');
 
 /**
- * 必填
+ * 格式
  * @param value
  * @returns {string | undefined}
  */

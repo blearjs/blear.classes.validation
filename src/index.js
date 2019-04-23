@@ -209,6 +209,16 @@ var Validation = Events.extend({
     },
 
     /**
+     * 必须是指定选项中的一个
+     * @param options
+     * @param [message]
+     * @returns {Validation}
+     */
+    option: function (options, message) {
+        return this.constrain('option', options, message)
+    },
+
+    /**
      * 规则验证
      * @param pattern {RegExp} 正则表达式
      * @param [message] {string} 消息
@@ -325,6 +335,7 @@ staticRules.max = require('./rules/max');
 staticRules.maxLength = require('./rules/max-length');
 staticRules.min = require('./rules/min');
 staticRules.minLength = require('./rules/min-length');
+staticRules.option = require('./rules/option');
 staticRules.pattern = require('./rules/pattern');
 staticRules.required = require('./rules/required');
 staticRules.trim = require('./rules/trim');

@@ -1,5 +1,5 @@
 /**
- * 文件描述
+ * 类型
  * @author ydr.me
  * @create 2018-10-29 15:43
  * @update 2018-10-29 15:43
@@ -8,7 +8,7 @@
 
 'use strict';
 
-var validator = require('blear.utils.validator');
+// var validator = require('blear.utils.validator');
 var typeis = require('blear.utils.typeis');
 var array = require('blear.utils.array');
 
